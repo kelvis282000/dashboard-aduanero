@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Control de Despachos y DUA - Gerencia Puerto</title>
+  <!-- SEO Tags -->
+  <meta name="description" content="Dashboard en tiempo real para el control de despacho de cargas y estatus DUA en el puerto. Sincronizado vía bot de Telegram del SENIAT.">
+  <link rel="stylesheet" href="styles.css?v=1.0.4">
+</head>
+<body>
+
+  <!-- Header Section -->
+  <header class="main-header" id="main-header">
+    <div class="logo-container">
+      <!-- Geometric Modern SVG Logo for Puerto de La Guaira -->
+      <div class="logo-placeholder" id="logo-puerto" aria-label="Logo del Puerto">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+          <circle cx="50" cy="50" r="45" fill="#e2e8f0" stroke="#1e3a8a" stroke-width="4"/>
+          <path d="M50 20V80M30 40H70M30 60H70" stroke="#1e3a8a" stroke-width="6" stroke-linecap="round"/>
+          <path d="M50 20L35 35M50 20L65 35M50 80L35 65M50 80L65 65" stroke="#1e3a8a" stroke-width="6" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="header-center">
+      <h1 class="header-title" id="header-title">Panel de Control de Despachos y DUA</h1>
+      <div class="header-subtitle">
+        <span>Terminal de Operaciones del Puerto</span>
+        <span style="color: var(--text-muted)">|</span>
+        <span style="font-weight: 700; color: var(--primary-light)">SENIAT Bot Feed</span>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <div class="digital-clock" id="digital-clock">09:00:00</div>
+      <div class="last-update" id="last-update-wrapper">
+        <div class="last-update-dot"></div>
+        <span id="last-update-text">Actualizado hace un momento</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="dashboard-container">
+    
+    <!-- KPI Cards Section -->
+    <section class="kpi-grid" aria-label="Tarjetas de Resumen KPI">
+      <!-- Total Cargas -->
+      <div class="kpi-card total" id="kpi-total-card">
+        <div class="kpi-info">
+          <span class="kpi-label">Cargas Registradas Hoy</span>
+          <div class="kpi-value" id="kpi-total">0</div>
+          <span class="kpi-subtext" id="kpi-total-sub">En cola de validación</span>
+        </div>
+        <div class="kpi-icon-wrapper">
+          <!-- Container SVG Icon -->
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+            <line x1="2" y1="10" x2="22" y2="10"/>
+            <line x1="12" y1="3" x2="12" y2="17"/>
+            <line x1="7" y1="3" x2="7" y2="17"/>
+            <line x1="17" y1="3" x2="17" y2="17"/>
+            <line x1="10" y1="21" x2="14" y2="21"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Liberados (SI) -->
+      <div class="kpi-card liberado" id="kpi-liberados-card">
+        <div class="kpi-info">
+          <span class="kpi-label">DUA Liberados (SÍ)</span>
+          <div class="kpi-value" id="kpi-liberados">0</div>
+          <span class="kpi-subtext" id="kpi-liberados-sub">Autorizados para despacho</span>
+        </div>
+        <div class="kpi-icon-wrapper">
+          <!-- Success Badge SVG Icon -->
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- En Revisión (NO) -->
+      <div class="kpi-card revision" id="kpi-revisión-card">
+        <div class="kpi-info">
+          <span class="kpi-label">DUA en Revisión (NO)</span>
+          <div class="kpi-value" id="kpi-revision">0</div>
+          <span class="kpi-subtext" id="kpi-revision-sub">Retenidos / En revisión física</span>
+        </div>
+        <div class="kpi-icon-wrapper">
+          <!-- Danger/Alert Warning SVG Icon -->
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+
+
+    <!-- Main Table / Cards Grid Container -->
+    <section class="data-display-section" aria-label="Tabla de cargas y contenedores">
+      <!-- Desktop Table (Screen >= 768px) -->
+      <div class="table-container" id="table-container">
+        <table class="modern-table" id="cargo-table">
+          <thead>
+            <tr>
+              <th scope="col">ID Contenedor</th>
+              <th scope="col">Número DUA</th>
+              <th scope="col">Agencia de Aduana</th>
+              <th scope="col">Hora Ingreso</th>
+              <th scope="col">Estatus SENIAT</th>
+            </tr>
+          </thead>
+          <tbody id="cargo-table-body">
+            <!-- Dynamically populated by app.js -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Mobile List Layout (Screen < 768px) -->
+      <div class="mobile-cards-list" id="mobile-cards-list">
+        <!-- Dynamically populated by app.js -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer Section -->
+  <footer class="main-footer" id="main-footer">
+    <div>
+      <span>Puerto Gerencia Operativa &copy; 2026</span>
+      <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+      <span>Terminal Marítimo Principal</span>
+    </div>
+    
+    <div class="footer-connection" id="bot-status-container">
+      <div class="connection-indicator online" id="bot-status-indicator"></div>
+      <span class="footer-system-status" id="bot-status-text">Servicio de Telegram Bot: En línea</span>
+    </div>
+  </footer>
+
+  <!-- Giant Full-Screen Overlay for 15s recent approvals -->
+  <div id="release-overlay" class="release-overlay hidden">
+    <div class="release-card">
+      <div class="release-header">
+        <span class="release-badge">✓ DESPACHO LIBERADO</span>
+      </div>
+      <div class="release-body">
+        <div class="release-icon-wrapper">
+          <div class="release-pulse-ring"></div>
+          <div class="release-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+        </div>
+        <h2 id="overlay-container-id">MSKU9845102</h2>
+        <p class="overlay-dua">DUA: <span id="overlay-dua-number">012-2026-0845</span></p>
+        <p class="overlay-agency" id="overlay-agency-name">Aduanas La Guaira C.A.</p>
+      </div>
+      <div class="release-footer">
+        <div class="release-progress-bar">
+          <div class="release-progress-fill" id="overlay-progress"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Area -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Main JavaScript File -->
+  <script src="app.js?v=1.0.4"></script>
+</body>
+</html>
