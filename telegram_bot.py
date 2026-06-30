@@ -19,22 +19,22 @@ logger = logging.getLogger(__name__)
 # Callback hook to notify FastAPI server (which broadcasts to websockets)
 on_status_change = None
 
+
 async def send_telegram_request(method, payload):
     """Utility to send async requests to Telegram API."""
     if not TOKEN or TOKEN == "YOUR_TELEGRAM_BOT_TOKEN_HERE":
         logger.warning(f"Telegram Bot Token not configured. Skipping API call: {method}")
         return None
-        
+    
     async with httpx.AsyncClient() as client:
         try:
-            response = await client.post(f"{API_URL}/{method}", json=payload, timeout=10.0)
-            if response.status_code != 200:
-                logger.error(f"Telegram API returned error {response.status_code}: {response.text}")
-                return None
+            response = await client.post(f"{API_URL}/{method}", json=payload)
+            response.raise_for_status()
             return response.json()
         except Exception as e:
-            logger.error(f"Exception calling Telegram API: {e}")
+            logger.error(f"Error sending request to Telegram: {e}")
             return None
+
 
 async def notify_new_cargo(cargo):
     """Sends an alert to all registered analysts on Telegram with inline buttons."""
